@@ -127,14 +127,14 @@ module Helpers
 
 	def self.display_header; puts "-" * 45 end
 
-	def self.display_progress(a, b, c, f)
+	def self.display_progress(p)
 		display_header
 		puts "A="
-		pretty_print(a)
-		puts "B=" + b.inspect
-		puts "C=" + c.inspect
-		puts "F=" + f.inspect
-		puts solution_str(a,b,f)
+		pretty_print(p[:a])
+		puts "B=" + p[:b].inspect
+		puts "C=" + p[:c].inspect
+		puts "F=" + p[:f].inspect
+		puts solution_str(p[:a],p[:b],p[:f])
 	end
 
 	def self.solution_str(a, b, f)
@@ -167,22 +167,14 @@ end
 module ExampleProblem
 	def self.show_step(stepno); puts "Step #{stepno}"; stepno+1 end
 
-	def self.solve
-		a = [[1.0, 1.0, 1.0, 0.0, 0.0],
-			 [6.0, 9.0, 0.0, 1.0, 0.0],
-			 [0.0, 1.0, 0.0, 0.0, 1.0]]
-		b = [100.0, 720.0, 60.0]
-		c = [10.0, 20.0, 0.0, 0.0, 0.0].map &:neg
-		f = [0.0]
-		
-		Helpers.display_progress(a,b,c,f)
+	def self.solve(p)
+		Helpers.display_progress(p)
 		stepno = show_step(0)
 
 		while true
-			t = SplxPrimal.merge_matrices(a,b,c,f)
+			t = MatrixHelpers.merge_matrices(p[:a],p[:b],p[:c],p[:f])
 			state = SplxPrimal.iterate_unified!(t)
-			m = SplxPrimal.disperse_tableau(t)
-			a, b, c, f = m.to_array(:a,:b,:c,:f)
+			p = MatrixHelpers.disperse_tableau(t)
 			case state
 				when :succ
 					puts "Found optimal solution"
@@ -191,11 +183,17 @@ module ExampleProblem
 					puts "Failed"
 					return
 				when :unfinished
-					Helpers.display_progress(a, b, c, f)
+					Helpers.display_progress(p)
 					stepno = show_step(stepno)
 			end
 		end
 	end
 end
 
-#ExampleProblem.solve
+a = [[1.0, 1.0, 1.0, 0.0, 0.0],
+	 [6.0, 9.0, 0.0, 1.0, 0.0],
+	 [0.0, 1.0, 0.0, 0.0, 1.0]]
+b = [100.0, 720.0, 60.0]
+c = [10.0, 20.0, 0.0, 0.0, 0.0].map &:neg
+f = [0.0]
+ExampleProblem.solve({a:a,b:b,c:c,f:f})
