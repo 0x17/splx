@@ -9,12 +9,14 @@ class ArrayExtensionsTest < Test::Unit::TestCase
 		assert_equal([1,8], [1,8,5].butlast)
 		assert_equal([], [2].butlast)
 	end
-end
-
-class HashExtensionsTest < Test::Unit::TestCase
-	def test_to_array
-		assert_equal([],{}.to_array())
-		assert_equal([1,2,3], {a:1,b:3,c:2}.to_array(:a,:c,:b))
+	def test_exists?
+		assert_equal(true, [1,2,3].exists? {|i| i==1})
+		assert_equal(false, [1,3,5].exists? {|i| i.even?})
+		assert_equal(false, [].exists? {|i| true})
+	end
+	def test_forall?
+		assert_equal(true, [2,4,8,16,32,64].forall? {|i| i.even?})
+		assert_equal(false, [1,2,4,8,16,32,64].forall? {|i| i.even?})
 	end
 end
 
@@ -31,22 +33,18 @@ class MatrixHelpersTest < Test::Unit::TestCase
 	end
 end
 
-class SplxPrimalTest < Test::Unit::TestCase
-	def test_pivot_col; assert_equal(1, SplxPrimal.pivot_col([-10, -20, 0, 0, 0])) end
-	def test_pivot_row
-		assert_equal(2, SplxPrimal.pivot_row([[1,2],[3,4],[5,6]], [9,6,5], 0))
-		assert_equal(0, SplxPrimal.pivot_row([[1,2],[0,4],[0,6]], [9,6,5], 0))
-		assert_equal(1, SplxPrimal.pivot_row([[1,2],[3,4],[-5,6]], [9,6,5], 0))
-	end
-	def test_iterate_unified
-	end
-end
-
 class HelpersTest < Test::Unit::TestCase
 	def test_solution_str
 		actual_s = Helpers.solution_str([[3,0,1],[8,1,0]],[4,5],[40])
 		assert_equal("Solution x=[0, 5, 4]\nObjective f=[40]\nFeasible? yes", actual_s)
 		actual_s = Helpers.solution_str([[3,0,1],[8,1,0]],[-4,5],[40])
 		assert_equal("Solution x=[0, 5, -4]\nObjective f=[40]\nFeasible? no", actual_s)
+	end
+end
+
+class IPSolverTest < Test::Unit::TestCase
+	def test_integer?
+		assert_equal(true, IPSolver.integer?([1,2,3,4,5]))
+		assert_equal(false, IPSolver.integer?([2.5, 2, 4, 5]))
 	end
 end
